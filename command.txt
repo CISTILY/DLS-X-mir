@@ -1,0 +1,17 @@
+Command to indexing and DLS
+4. java -cp out hiD.search.SearchAccuracyTest E:\DLS\SearchAndIndexingJavaCode\Indexes\train_small_512D_999v_21Nr.ndx E:\DLS\SearchAndIndexingJavaCode\DataSets\test_small_512D_9v.vecs true 0.99 4
+
+3. java -cp out hiD.search.TimeIndexSearch E:\DLS\SearchAndIndexingJavaCode\Indexes\train_small_512D_999v_21Nr.ndx E:\DLS\SearchAndIndexingJavaCode\DataSets\test_small_512D_9v.vecs 3 true
+
+2. java -cp out hiD.index.BuildIndex E:\DLS\SearchAndIndexingJavaCode\DataSets\train_small_512D_999v.vecs 21
+
+1. java -cp out hiD.data.BuildDataSet E:\DLS\SearchAndIndexingJavaCode\train_small.txt true
+
+Command to compile java source file
+javac -d ./out/ E:/DLS/SearchAndIndexingJavaCode/hiD/index/*.java
+javac -d ./out/ E:/DLS/SearchAndIndexingJavaCode/hiD/data/*.java
+javac -d ./out/ E:/DLS/SearchAndIndexingJavaCode/hiD/search/*.java
+javac -d ./out/ E:/DLS/SearchAndIndexingJavaCode/hiD/utils/*.java
+
+Command to training resnet50 on covid-crx4
+python train.py --dataset 'covid' --dataset-dir 'E:\covidx-cxr2\versions\9' --resume model.pth --train-image-list E:\DLS\covidx-cxr2\versions\9\train.txt --test-image-list E:\DLS\covidx-cxr2\versions\9\test.txt -p 2

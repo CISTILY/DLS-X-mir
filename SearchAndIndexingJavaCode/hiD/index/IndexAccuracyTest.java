@@ -5,8 +5,8 @@
 package hiD.index;
 
 import hiD.data.*;
-import hiD.utils.*;
 import hiD.search.*;
+import hiD.utils.*;
 
 //--------------------------------------------------------------------------------------------------------
 // IndexAccuracyTest
@@ -208,6 +208,9 @@ public class IndexAccuracyTest extends FormatUtils {
     log(reportHeader("Index Accuracy Test",theStartTime));  
 
     if (kOnDevBox) {
+      testAccuracy(Index.load(inIndexFilename));
+      
+    } else {
       testAccuracy(Index.load("convnext_large_in22k_partial_1536D_1000Kv_20Nr"));
       testAccuracy(Index.load("convnext_large_in22k_partial_1536D_1000Kv_30Nr"));
       testAccuracy(Index.load("convnext_large_in22k_partial_1536D_1000Kv_40Nr"));
@@ -219,9 +222,6 @@ public class IndexAccuracyTest extends FormatUtils {
       testAccuracy(Index.load("resnet50_conv5block1_2conv_tf2_partial_512D_1000Kv_60Nr"));
       testAccuracy(Index.load("resnet50_conv5block1_2conv_tf2_partial_512D_1000Kv_80Nr"));
       testAccuracy(Index.load("resnet50_conv5block1_2conv_tf2_partial_512D_1000Kv_110Nr"));
-
-    } else {
-      testAccuracy(Index.load(inIndexFilename));
     }
 
     log(reportFooter(theStartTime));

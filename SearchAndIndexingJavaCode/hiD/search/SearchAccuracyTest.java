@@ -5,8 +5,8 @@
 package hiD.search;
 
 import hiD.data.*;
-import hiD.utils.*;
 import hiD.index.*;
+import hiD.utils.*;
 
 //--------------------------------------------------------------------------------------------------------
 // SearchAccuracyTest
@@ -130,8 +130,11 @@ public class SearchAccuracyTest extends FormatUtils {
       int               inRecallN,
       SearchResultSet   inBruteResultSet) throws Exception {
     
-    if ((inRecall<0.9)||(inRecall>=1.0))
+    if ((inRecall<0.9)||(inRecall>=1.0)) {
+      log("Recall "+ formatDouble(inRecall));
       throw new RuntimeException("Recall must be be 0.9 or greater and less than 1.0");
+    }
+  
     double inMissingLimit=inRecallN*(1.0-inRecall);
     
     log("\n\nIndex Search Accuracy Test");
@@ -264,11 +267,18 @@ public class SearchAccuracyTest extends FormatUtils {
     int theRecallN;
 
     if (kOnDevBox) {
-//      theIndex=Index.load("convnext_large_in22k_partial_1536D_1000Kv_50Nr");
-//      theQuerySet=DataSet.load("convnext_large_in22k_test_1536D_10Kv");
+      theIndex=Index.load(inIndexFilename);
+      theQuerySet=DataSet.load(inQuerySetFilename);
+      theIncludeDups=Boolean.parseBoolean(inIncludeDups);
+      theRecall=Double.parseDouble(inReall);
+      theRecallN=Integer.parseInt(inRecallN);
       
-//      theIndex=Index.load("resnet50_conv5block1_2conv_tf2_partial_512D_1000Kv_60Nr");
-//      theQuerySet=DataSet.load("resnet50_conv5block1_2conv_tf2_test_512D_10Kv");
+    } else {
+      theIndex=Index.load("convnext_large_in22k_partial_1536D_1000Kv_50Nr");
+      theQuerySet=DataSet.load("convnext_large_in22k_test_1536D_10Kv");
+        
+      theIndex=Index.load("resnet50_conv5block1_2conv_tf2_partial_512D_1000Kv_60Nr");
+      theQuerySet=DataSet.load("resnet50_conv5block1_2conv_tf2_test_512D_10Kv");
       
       theIndex=Index.load("GIST_train_960D_1000Kv_50Nr");
       theQuerySet=DataSet.load("GIST_test_960D_1000v");
@@ -276,13 +286,6 @@ public class SearchAccuracyTest extends FormatUtils {
       theIncludeDups=true;
       theRecall=0.99;
       theRecallN=10;
-      
-    } else {
-      theIndex=Index.load(inIndexFilename);
-      theQuerySet=DataSet.load(inQuerySetFilename);
-      theIncludeDups=Boolean.parseBoolean(inIncludeDups);
-      theRecall=Double.parseDouble(inRecallN);
-      theRecallN=Integer.parseInt(inRecallN);
     }
 
     findSearchNNearForRecallAtN(theIndex,theQuerySet,theIncludeDups,theRecall,theRecallN);

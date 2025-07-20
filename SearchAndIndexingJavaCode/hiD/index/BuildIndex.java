@@ -2,10 +2,8 @@
 // BuildIndex.java
 //--------------------------------------------------------------------------------------------------------
 
-package hiD.index;
-
+package  hiD.index;
 import hiD.data.*;
-import hiD.index.extras.IndexAccuracyTest;
 import hiD.utils.*;
 
 //--------------------------------------------------------------------------------------------------------
@@ -27,10 +25,10 @@ public class BuildIndex extends FormatUtils {
   private static CreateHeap.CreateInfo   gCreateInfo;
 
 //--------------------------------------------------------------------------------------------------------
-// buildIndex
+// BuildIndex
 //--------------------------------------------------------------------------------------------------------
 
-  public static Index buildIndex(DataSet inDataSet, int inIndexNNear) throws Exception {
+  public static Index BuildIndex(DataSet inDataSet, int inIndexNNear) throws Exception {
 
     gDataSet=inDataSet;
     gIndexNNear=inIndexNNear;
@@ -328,22 +326,22 @@ public class BuildIndex extends FormatUtils {
     log(reportHeader("Build HiD Search Index",theStartTime));
  
     if (kOnDevBox) {  
+      BuildIndex(DataSet.load(inDataSetFilename),
+            Integer.parseInt(inIndexNNear));
       
-      buildIndex(DataSet.load("Artificial_train_40D_9000v"),20);
-      buildIndex(DataSet.load("Faces_train_20D_9304v"),20);     
-      buildIndex(DataSet.load("Corel_train_32D_58Kv"),20);      
-      buildIndex(DataSet.load("CovType_train_54D_571Kv"),20);   
-      buildIndex(DataSet.load("TinyImages_train_384D_90Kv"),20);
-      buildIndex(DataSet.load("Twitter_train_78D_573Kv"),20);   
-      buildIndex(DataSet.load("YearPred_train_90D_505Kv"),20);  
-      buildIndex(DataSet.load("MNIST_train_784D_60Kv"),20);
-      buildIndex(DataSet.load("FMNIST_train_784D_60Kv"),20);
-      buildIndex(DataSet.load("SIFT_train_128D_1000Kv"),20);
-      buildIndex(DataSet.load("GIST_train_960D_1000Kv"),20);  
 
     } else {  
-      buildIndex(DataSet.load(inDataSetFilename),
-                 Integer.parseInt(inIndexNNear));
+      BuildIndex(DataSet.load("Artificial_train_40D_9000v"),20);
+      BuildIndex(DataSet.load("Faces_train_20D_9304v"),20);     
+      BuildIndex(DataSet.load("Corel_train_32D_58Kv"),20);      
+      BuildIndex(DataSet.load("CovType_train_54D_571Kv"),20);   
+      BuildIndex(DataSet.load("TinyImages_train_384D_90Kv"),20);
+      BuildIndex(DataSet.load("Twitter_train_78D_573Kv"),20);   
+      BuildIndex(DataSet.load("YearPred_train_90D_505Kv"),20);  
+      BuildIndex(DataSet.load("MNIST_train_784D_60Kv"),20);
+      BuildIndex(DataSet.load("FMNIST_train_784D_60Kv"),20);
+      BuildIndex(DataSet.load("SIFT_train_128D_1000Kv"),20);
+      BuildIndex(DataSet.load("GIST_train_960D_1000Kv"),20);  
     }
     
     log(reportFooter(theStartTime));

@@ -5,8 +5,8 @@
 package hiD.search;
 
 import hiD.data.*;
-import hiD.utils.*;
 import hiD.index.*;
+import hiD.utils.*;
 
 //--------------------------------------------------------------------------------------------------------
 // TimeIndexSearch
@@ -56,7 +56,13 @@ public class TimeIndexSearch extends FormatUtils {
     
     double theAvgTimePerQuery=theSum/theNRuns;
     log("\n\nAverage Time (excluding warmup run):  "+formatDuration(theAvgTimePerQuery)+" per query");
-    
+ 
+    log("\n\n--- Nearest Neighbor Search Results ---");
+    for (int i = 0; i < theNQueries; i++) {
+      SearchResult result = theSearchResultSet.getSearchResult(i);
+      result.show();
+    }
+
     return theAvgTimePerQuery;
   }
 
@@ -79,16 +85,16 @@ public class TimeIndexSearch extends FormatUtils {
     boolean theIncludeDups;
 
     if (kOnDevBox) {
-      theIndex=Index.load("GIST_train_960D_1000Kv_30Nr");
-      theQuerySet=DataSet.load("GIST_test_960D_1000v");
-      theSearchNNear=40;
-      theIncludeDups=false;
-
-    } else {
       theIndex=Index.load(inIndexFilename);
       theQuerySet=DataSet.load(inQuerySetFilename);
       theSearchNNear=Integer.parseInt(inSearchNNear);
       theIncludeDups=Boolean.parseBoolean(inIncludeDups);
+
+    } else {
+      theIndex=Index.load("GIST_train_960D_1000Kv_30Nr");
+      theQuerySet=DataSet.load("GIST_test_960D_1000v");
+      theSearchNNear=40;
+      theIncludeDups=false;
     }
 
     timeIndexSearch(theIndex,theSearchNNear,theIncludeDups,theQuerySet);
