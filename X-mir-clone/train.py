@@ -47,6 +47,7 @@ def retrieval_accuracy(output, target, topk=(1,)):
         batch_size = target.size(0)
 
         _, pred = output.topk(maxk, 1, True, True)
+        pred = pred.to(target.device)  # move pred to the same device as target
         pred = target[pred].t()
         correct = pred.eq(target[None])
 
@@ -101,10 +102,12 @@ def main(args):
     random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda')
     p = args.labels_per_batch if not args.anomaly else args.labels_per_batch - 1
     k = args.samples_per_label
     batch_size = p * k
+ 
+    print(device)
 
     # Choose model
     if args.model == 'densenet121':
@@ -191,11 +194,12 @@ def main(args):
         print('Training...')
         train_epoch(model, optimizer, criterion, train_loader,
                     device, epoch, args.print_freq)
+        print('Saving...')
+        save(model, epoch, args.save_dir, args)
 
     print('Evaluating...')
     evaluate(model, test_loader, device)
-    print('Saving...')
-    save(model, epoch, args.save_dir, args)
+    
 
 
 def parse_args():
@@ -216,11 +220,11 @@ def parse_args():
                         help='Use random resizing data augmentation')
     parser.add_argument('--anomaly', action='store_true',
                         help='Train without anomaly class')
-    parser.add_argument('--model', default='resnet50',
+    parser.add_argument('--model', default='densenet121',
                         help='Model to use (densenet121 or resnet50)')
     parser.add_argument('--embedding-dim', default=None, type=int,
                         help='Embedding dimension of model')
-    parser.add_argument('-p', '--labels-per-batch', default=3, type=int,
+    parser.add_argument('-p', '--labels-per-batch', default=2, type=int,
                         help='Number of unique labels/classes per batch')
     parser.add_argument('-k', '--samples-per-label', default=16, type=int,
                         help='Number of samples per label in a batch')

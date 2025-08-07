@@ -17,6 +17,7 @@ def retrieval_accuracy(output, target, topk=(1,)):
         batch_size = target.size(0)
 
         _, pred = output.topk(maxk, 1, True, True)
+        pred = pred.to(target.device)  # move pred to the same device as target
         pred = target[pred].t()
         correct = pred.eq(target[None])
 
@@ -226,12 +227,12 @@ def parse_args():
                         help='Test image list')
     parser.add_argument('--mask-dir', default=None,
                         help='Segmentation masks path (if used)')
-    parser.add_argument('--model', default='densenet121',
+    parser.add_argument('--model', default='resnet50',
                         help='Model to use (densenet121 or resnet50)')
     parser.add_argument('--embedding-dim', default=None, type=int,
                         help='Embedding dimension of model')
     parser.add_argument('--eval-batch-size', default=64, type=int)
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+    parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
                         help='Number of data loading workers')
     parser.add_argument('--save-dir', default='./results',
                         help='Result save directory')

@@ -206,6 +206,12 @@ public class Index extends FormatUtils {
     
     // Confirm index filename matches dataset filename
     String theDataSetFilename=extractIndexDataSetFilename(inIndexFilename);
+    log("Dataset filename from inDataSet: " + inDataSet.getStandardFilename());
+    log("Dataset filename from index file: " + theDataSetFilename);
+
+    boolean isEqual = inDataSet.getStandardFilename().equals(theDataSetFilename);
+    log("Filenames equal? " + String.valueOf(isEqual));
+
     if (!inDataSet.getStandardFilename().equals(theDataSetFilename))
       throw new RuntimeException("Index does not match dataset: "+inIndexFilename);
 
