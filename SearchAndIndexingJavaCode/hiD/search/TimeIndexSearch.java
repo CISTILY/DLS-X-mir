@@ -8,6 +8,9 @@ import hiD.data.*;
 import hiD.index.*;
 import hiD.utils.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 //--------------------------------------------------------------------------------------------------------
 // TimeIndexSearch
 //--------------------------------------------------------------------------------------------------------
@@ -62,6 +65,11 @@ public class TimeIndexSearch extends FormatUtils {
       SearchResult result = theSearchResultSet.getSearchResult(i);
       result.show();
     }
+
+    // Save only distance matrix
+    log("\nSaving distance matrix to dists.txt ...");
+    theSearchResultSet.saveDistances("dists.txt");
+    log("Done. File saved: dists.txt");
 
     return theAvgTimePerQuery;
   }

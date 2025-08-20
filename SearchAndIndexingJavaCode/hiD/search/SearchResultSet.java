@@ -8,12 +8,16 @@ import hiD.data.*;
 import hiD.index.*;
 import hiD.utils.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 //--------------------------------------------------------------------------------------------------------
 // SearchResultSet
 //--------------------------------------------------------------------------------------------------------
 
 public class SearchResultSet extends FormatUtils {
-  
+
 //--------------------------------------------------------------------------------------------------------
 // SearchResultSet member vars
 //--------------------------------------------------------------------------------------------------------
@@ -127,5 +131,22 @@ public class SearchResultSet extends FormatUtils {
         kNotFound);
    }  
 
+  // Save only distances (squared) to file
+  public void saveDistances(String distFilename) throws IOException {
+      try (BufferedWriter distWriter = new BufferedWriter(new FileWriter(distFilename))) {
+          int nResults = getNQueryVectors();
+          log(""+nResults);
+          for (int i = 0; i < nResults; i++) {
+              SearchResult result = getSearchResult(i);
+              float[] dists = result.getNearDistance2s();  // all neighbor distances
+              int nNeighbors = result.getSearchNNear();
+              for (int j = 0; j < nNeighbors; j++) {
+                  distWriter.write(Float.toString(dists[j]));
+                  if (j < nNeighbors - 1) distWriter.write(" ");
+              }
+              distWriter.newLine();
+          }
+      }
+  }
 }
 

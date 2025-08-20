@@ -255,28 +255,29 @@ public class BuildDataSet extends FormatUtils {
               
               String theCompList=theLine.substring(thePos+1);
               String[] theComps=breakOnChars(theCompList,',');
+              log("" + theComps.length);
               if (theNDims==0)
                 theNDims=theComps.length;
               else if (theComps.length!=theNDims) {
                 log("Bad line:  NDims changed from "+theNDims+" to "+theComps.length+"\n"+theLine);
                 theNErrors++;
-              } else {
+              } 
                 
-                float[] theVector=new float[theNDims];
-                int i=0;
-                try {
-                  for (i=0; i<theNDims; i++) 
-                    theVector[i]=Float.parseFloat(theComps[i]);
-                } catch (Exception e) {
-                  log("Bad line: Comp "+i+" is not a parsable float "+theLine);
-                  theNErrors++;
-                }
-                
-                theVectorList.add(theVector);
-                theDescriptorList.add(theDescriptor);
-                if (theVectorList.size()%100000==0)
-                  log("    "+theVectorList.size()+" vectors");
+              float[] theVector=new float[theNDims];
+              int i=0;
+              try {
+                for (i=0; i<theNDims; i++) 
+                  theVector[i]=Float.parseFloat(theComps[i]);
+              } catch (Exception e) {
+                log("Bad line: Comp "+i+" is not a parsable float "+theLine);
+                theNErrors++;
               }
+              
+              theVectorList.add(theVector);
+              theDescriptorList.add(theDescriptor);
+              if (theVectorList.size()%100000==0)
+                log("    "+theVectorList.size()+" vectors");
+            
             }
           }
         }
@@ -327,9 +328,12 @@ public class BuildDataSet extends FormatUtils {
 
     // Hard coded values for convenience when run in dev envr
     if (kOnDevBox) {  
-            
-      boolean theNormalize=true;
+      buildOpenIDataSet(inSourceFilename,Boolean.parseBoolean(inNormalize));
 
+    // Parameters passed in from command line for when run in production
+    } else {
+      boolean theNormalize=true;
+  
       buildCSVDataSet(kSourceDir+"/Artificial/Artificial_test.csv",theNormalize);
       buildCSVDataSet(kSourceDir+"/Artificial/Artificial_train.csv",theNormalize);
       buildCSVDataSet(kSourceDir+"/Faces/Faces_test.csv",theNormalize);
@@ -354,11 +358,7 @@ public class BuildDataSet extends FormatUtils {
       buildCSVDataSet(kSourceDir+"/SIFT/SIFT_train.csv",theNormalize);
       buildCSVDataSet(kSourceDir+"/GIST/GIST_test.csv",theNormalize);
       buildCSVDataSet(kSourceDir+"/GIST/GIST_train.csv",theNormalize);
-
-    // Parameters passed in from command line for when run in production
-    } else 
-      buildOpenIDataSet(inSourceFilename,Boolean.parseBoolean(inNormalize));
-
+    }
     log(reportFooter(theStartTime));
   }
  

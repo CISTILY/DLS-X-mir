@@ -219,11 +219,11 @@ def parse_args():
                         help='Segmentation masks path (if used)')
     parser.add_argument('--results', default=None,
                         help='Results file to load')
-    parser.add_argument('--model', default='resnet50',
+    parser.add_argument('--model', default='densenet121',
                         help='Model to use (densenet121 or resnet50)')
     parser.add_argument('--embedding-dim', default=None, type=int,
                         help='Embedding dimension of model')
-    parser.add_argument('--explainer', default='sbsm',
+    parser.add_argument('--explainer', default='simatt',
                         help='Explanation type (sbsm, simatt, or simcam)')
     parser.add_argument('--self-saliency', action='store_true',
                         help='Compute self-similarity saliency')

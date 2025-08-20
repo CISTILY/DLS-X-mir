@@ -9,6 +9,18 @@ from read_data import ISICDataSet, ChestXrayDataSet
 
 from model import ResNet50, DenseNet121
 
+def load_distance_matrix(file_path):
+    """
+    Reads a distance matrix from a text file where each row 
+    is space-separated distances.
+    """
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+    
+    # split each line into floats
+    matrix = [list(map(float, line.strip().split())) for line in lines if line.strip()]
+    
+    return torch.tensor(matrix, dtype=torch.float32)
 
 def retrieval_accuracy(output, target, topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
@@ -27,127 +39,32 @@ def retrieval_accuracy(output, target, topk=(1,)):
             res.append(correct_k * (100.0 / batch_size))
     return res
 
-
-# Source: https://github.com/filipradenovic/cnnimageretrieval-pytorch/blob/master/cirtorch/utils/evaluate.py
-def compute_ap(ranks, nres):
-    """
-    Computes average precision for given ranked indexes.
-
-    Arguments
-    ---------
-    ranks : zerro-based ranks of positive images
-    nres  : number of positive images
-
-    Returns
-    -------
-    ap    : average precision
-    """
-
-    # number of images ranked by the system
-    nimgranks = len(ranks)
-
-    # accumulate trapezoids in PR-plot
-    ap = 0
-
-    recall_step = 1. / nres
-
-    for j in np.arange(nimgranks):
-        rank = ranks[j]
-
-        if rank == 0:
-            precision_0 = 1.
-        else:
-            precision_0 = float(j) / rank
-
-        precision_1 = float(j + 1) / (rank + 1)
-
-        ap += (precision_0 + precision_1) * recall_step / 2.
-
-    return ap
-
-
-def compute_map(ranks, gnd, kappas=[]):
-    """
-    Computes the mAP for a given set of returned results.
-         Usage: 
-           mAP = compute_map (ranks, gnd) 
-                 computes mean average precsion (mAP) only
-
-           mAP, aps, pr, prs = compute_map (ranks, gnd, kappas) 
-                 computes mean average precision (mAP), average precision (aps) for each query
-                 computes mean precision at kappas (pr), precision at kappas (prs) for each query
-
-         Notes:
-         1) ranks starts from 0, ranks.shape = db_size X #queries
-         2) If there are no positive images for some query, that query is excluded from the evaluation
-    """
-
-    mAP = 0.
-    nq = len(gnd)  # number of queries
-    aps = np.zeros(nq)
-    pr = np.zeros(len(kappas))
-    prs = np.zeros((nq, len(kappas)))
-    nempty = 0
-
-    for i in np.arange(nq):
-        qgnd = np.where(gnd == gnd[i])[0]
-
-        # no positive images, skip from the average
-        if qgnd.shape[0] == 0:
-            aps[i] = float('nan')
-            prs[i, :] = float('nan')
-            nempty += 1
-            continue
-
-        # sorted positions of positive images (0 based)
-        pos = np.arange(ranks.shape[0])[np.in1d(ranks[:, i], qgnd)]
-
-        # compute ap
-        ap = compute_ap(pos, len(qgnd))
-        mAP = mAP + ap
-        aps[i] = ap
-
-        # compute precision @ k
-        pos += 1  # get it to 1-based
-        for j in np.arange(len(kappas)):
-            kq = min(max(pos), kappas[j])
-            prs[i, j] = (pos <= kq).sum() / kq
-        pr = pr + prs[i, :]
-
-    mAP = mAP / (nq - nempty)
-    pr = pr / (nq - nempty)
-
-    return mAP, aps, pr, prs
-
-
 @torch.no_grad()
 def evaluate(model, loader, device, args):
-    model.eval()
     embeds, labels = [], []
 
     for data in loader:
         samples, _labels = data[0].to(device), data[1]
-        out = model(samples)
-        embeds.append(out)
         labels.append(_labels)
 
-    embeds = torch.cat(embeds, dim=0)
     labels = torch.cat(labels, dim=0)
 
-    dists = -torch.cdist(embeds, embeds)
-    dists.fill_diagonal_(torch.tensor(float('-inf')))
 
     # top-k accuracy (i.e. R@K)
-    kappas = [1, 5, 10]
-    accuracy = retrieval_accuracy(dists, labels, topk=kappas)
-    accuracy = torch.stack(accuracy).numpy()
-    print('>> R@K{}: {}%'.format(kappas, np.around(accuracy, 2)))
+    #kappas = [1, 5, 10]
+    kappas = [3]
+
+    dists = load_distance_matrix("D:/DLS-X-mir/SearchAndIndexingJavaCode/dists.txt")
+
+    # accuracy = retrieval_accuracy(dists, labels, topk=kappas)
+    # accuracy = torch.stack(accuracy).numpy()
+    # print('>> R@K{}: {}%'.format(kappas, np.around(accuracy, 2)))
 
     # mean average precision and mean precision (i.e. mAP and pr)
-    ranks = torch.argsort(dists, dim=0, descending=True)
-    mAP, _, pr, _ = compute_map(ranks.cpu().numpy(), labels.numpy(), kappas)
-    print('>> mAP: {:.2f}%'.format(mAP * 100.0))
-    print('>> mP@K{}: {}%'.format(kappas, np.around(pr * 100.0, 2)))
+    # ranks = torch.argsort(dists, dim=0, descending=True)
+    # mAP, _, pr, _ = compute_map(ranks.cpu().numpy(), labels.numpy(), kappas)
+    # print('>> mAP: {:.2f}%'.format(mAP * 100.0))
+    # print('>> mP@K{}: {}%'.format(kappas, np.around(pr * 100.0, 2)))
 
     # Save results
     if args.save_dir:
@@ -156,17 +73,12 @@ def evaluate(model, loader, device, args):
         file_name = args.resume.split('/')[-1].split('.')[0]
 
         save_path = os.path.join(args.save_dir, file_name)
-        print(embeds)
-        print(embeds.shape)
-        print("------")
         print(labels)
         print(labels.shape)
         print("------")
         print(dists)
         print(dists.shape)
-        np.savez(save_path, embeds=embeds.cpu().numpy(),
-                 labels=labels.cpu().numpy(), dists=-dists.cpu().numpy(),
-                 kappas=kappas, acc=accuracy, mAP=mAP, pr=pr)
+        np.savez(save_path, labels=labels.cpu().numpy(), dists=-dists.cpu().numpy())
 
 
 def main(args):
