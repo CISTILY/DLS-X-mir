@@ -10,7 +10,7 @@ from read_data import ISICDataSet, ChestXrayDataSet
 
 from loss import TripletMarginLoss
 from sampler import PKSampler
-from model import ResNet50, DenseNet121
+from model import ResNet50, DenseNet121, ViT
 
 
 def train_epoch(model, optimizer, criterion, data_loader, device, epoch, print_freq):
@@ -114,6 +114,8 @@ def main(args):
         model = DenseNet121(embedding_dim=args.embedding_dim)
     elif args.model == 'resnet50':
         model = ResNet50(embedding_dim=args.embedding_dim)
+    elif args.model == 'ViT':
+        model = ViT(embedding_dim=args.embedding_dim)
     else:
         raise NotImplementedError('Model not supported!')
 

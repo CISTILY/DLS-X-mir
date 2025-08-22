@@ -1,5 +1,7 @@
 1. Command to training resnet50 on covid-crx4
 python train.py --dataset 'covid' --dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9' --model densenet121 --resume model.pth --train-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train.txt --test-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/test.txt -p 2
+python train.py --dataset 'covid' --dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9' --model ViT --train-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train.txt --test-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/test.txt -p 2
+
 
 2. Inferece from trained ResNet50 or Densenet121
 python inference.py --embedding-dim 512 --resume D:/DLS-X-mir/X-mir-clone/checkpoints/covid_resnet50_seed_0_epoch_10_ckpt.pth --image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train
@@ -26,6 +28,7 @@ javac -d ./out/ D:/DLS-X-mir/SearchAndIndexingJavaCode/hiD/utils/*.java
 
 5. testing
 python test.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth
+python test.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_ViT_seed_0_epoch_6_ckpt.pth
 
 python read_dist.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth
 

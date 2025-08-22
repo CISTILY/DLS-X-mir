@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from read_data import ISICDataSet, ChestXrayDataSet
 
-from model import ResNet50, DenseNet121
+from model import ResNet50, DenseNet121, ViT
 
 
 def retrieval_accuracy(output, target, topk=(1,)):
@@ -177,6 +177,8 @@ def main(args):
         model = DenseNet121(embedding_dim=args.embedding_dim)
     elif args.model == 'resnet50':
         model = ResNet50(embedding_dim=args.embedding_dim)
+    elif args.model == 'ViT':
+        model = ViT(embedding_dim=args.embedding_dim)
     else:
         raise NotImplementedError('Model not supported!')
 
@@ -235,7 +237,7 @@ def parse_args():
                         help='Test image list')
     parser.add_argument('--mask-dir', default=None,
                         help='Segmentation masks path (if used)')
-    parser.add_argument('--model', default='densenet121',
+    parser.add_argument('--model', default='ViT',
                         help='Model to use (densenet121 or resnet50)')
     parser.add_argument('--embedding-dim', default=None, type=int,
                         help='Embedding dimension of model')

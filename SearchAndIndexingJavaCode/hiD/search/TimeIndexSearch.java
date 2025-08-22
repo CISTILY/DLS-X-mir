@@ -67,9 +67,9 @@ public class TimeIndexSearch extends FormatUtils {
     }
 
     // Save only distance matrix
-    log("\nSaving distance matrix to dists.txt ...");
-    theSearchResultSet.saveDistances("dists.txt");
-    log("Done. File saved: dists.txt");
+    log("\nSaving distance matrix to retrievalResult.txt ...");
+    theSearchResultSet.saveResult("retrievalResult.txt");
+    log("Done. File saved: retrievalResult.txt");
 
     return theAvgTimePerQuery;
   }

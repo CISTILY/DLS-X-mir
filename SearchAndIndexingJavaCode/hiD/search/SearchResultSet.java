@@ -132,21 +132,32 @@ public class SearchResultSet extends FormatUtils {
    }  
 
   // Save only distances (squared) to file
-  public void saveDistances(String distFilename) throws IOException {
-      try (BufferedWriter distWriter = new BufferedWriter(new FileWriter(distFilename))) {
-          int nResults = getNQueryVectors();
-          log(""+nResults);
-          for (int i = 0; i < nResults; i++) {
-              SearchResult result = getSearchResult(i);
-              float[] dists = result.getNearDistance2s();  // all neighbor distances
-              int nNeighbors = result.getSearchNNear();
-              for (int j = 0; j < nNeighbors; j++) {
-                  distWriter.write(Float.toString(dists[j]));
-                  if (j < nNeighbors - 1) distWriter.write(" ");
-              }
-              distWriter.newLine();
-          }
-      }
+  public void saveResult(String resultFilename) throws IOException {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFilename))) {
+        int nResults = getNQueryVectors();
+        log("Saving " + nResults + " queries to " + resultFilename);
+
+        for (int i = 0; i < nResults; i++) {
+            SearchResult result = getSearchResult(i);
+
+            // query name directly from SearchResult
+            String queryName = result.getQueryDescriptor();
+
+            // neighbor indices
+            int[] neighborIndices = result.getNearVectorDxs();
+            int nNeighbors = result.getSearchNNear();
+
+            // write: <query> <result1> <result2> ...
+            writer.write(queryName);
+
+            for (int j = 0; j < nNeighbors; j++) {
+                int neighborIdx = neighborIndices[j];
+                String neighborName = mDataSet.getDescriptor(neighborIdx).toString();
+                writer.write(" " + neighborName);
+            }
+            writer.newLine();
+        }
+    }
   }
 }
 

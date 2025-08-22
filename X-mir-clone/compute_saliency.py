@@ -14,6 +14,31 @@ from explanations import SBSMBatch, SimAtt, SimCAM
 from PIL import Image
 from torch.utils.data import Dataset
 
+def load_results(filename):
+    query_names = []
+    result_names = []
+
+    with open(filename, "r") as f:
+        for line in f:
+            parts = line.strip().split()
+            if not parts:
+                continue
+            query = parts[0]
+            results = parts[1:]
+
+            query_names.append(query)
+            result_names.append(results)
+
+    # Convert to tensors (PyTorch ≥ 2.1 supports string dtype)
+    try:
+        query_tensor = torch.tensor(query_names, dtype=torch.StringType)
+        result_tensor = torch.tensor(result_names, dtype=torch.StringType)
+    except TypeError:
+        # fallback: keep as list of strings if old PyTorch
+        query_tensor = query_names
+        result_tensor = result_names
+
+    return query_tensor, result_tensor
 
 def rank_retrieval(dists, labels, topk=1):
     """Finds top-k closest embeddings"""
@@ -85,38 +110,77 @@ def process(explainer, loader, device, args):
                 np.save(os.path.join(base_path, p.split('/')[-1]), s)
     else:
         # Load results
-        results = np.load(args.results)
-        pred, idx = rank_retrieval(
-            results['dists'], results['labels'], topk=args.topk)
-        image_list = loader.dataset.image_names
+        # results = np.load(args.results)
+        # pred, idx = rank_retrieval(
+        #     results['dists'], results['labels'], topk=args.topk)
+        # image_list = loader.dataset.image_names
 
-        for img, ind in zip(image_list, idx):
+        queries, results = load_results("D:/DLS-X-mir/SearchAndIndexingJavaCode/retrievalResult.txt")
+        print("Queries:", queries[0])
+        print("Results for first query:", results[0])
+
+        # for img, ind in zip(image_list, idx):
+        #     # Transform the query image
+        #     x_q = loader.dataset.transform(
+        #         Image.open(img)).unsqueeze(0).to(device)
+        #     x_q = torch.cat([x_q]*torch.cuda.device_count())
+
+        #     # Redefine loader here for each query image
+        #     x_r = [image_list[i] for i in ind]
+        #     dataset = ImageListDataSet(
+        #         image_dir='', image_list=x_r, transform=loader.dataset.transform)
+        #     loader = DataLoader(dataset, batch_size=args.eval_batch_size *
+        #                         torch.cuda.device_count(), num_workers=args.workers)
+
+        #     for i, data in enumerate(loader):
+        #         samples, paths = data[0].to(device), data[1]
+        #         salmaps = explainer(x_q, samples)
+
+        #         # convert to numpy
+        #         salmaps = salmaps.cpu().numpy()
+
+        #         # save output map
+        #         base_path = os.path.join(args.save_dir, img.split('/')[-1])
+        #         if not os.path.exists(base_path):
+        #             os.makedirs(base_path)
+
+        #         for s, p in zip(reversed(salmaps), reversed(paths)):
+        #             np.save(os.path.join(base_path, p.split('/')[-1]), s)
+
+        for q_idx, query_name in enumerate(queries):
             # Transform the query image
-            x_q = loader.dataset.transform(
-                Image.open(img)).unsqueeze(0).to(device)
-            x_q = torch.cat([x_q]*torch.cuda.device_count())
+            x_q = loader.dataset.transform(Image.open(query_name)).unsqueeze(0).to(device)
+            x_q = torch.cat([x_q] * torch.cuda.device_count())
 
-            # Redefine loader here for each query image
-            x_r = [image_list[i] for i in ind]
+            # Get results for this query
+            result_names = results[q_idx]
+            x_r_paths = result_names
+
+            # Create dataset & loader for results
             dataset = ImageListDataSet(
-                image_dir='', image_list=x_r, transform=loader.dataset.transform)
-            loader = DataLoader(dataset, batch_size=args.eval_batch_size *
-                                torch.cuda.device_count(), num_workers=args.workers)
+                image_dir='', image_list=x_r_paths, transform=loader.dataset.transform
+            )
+            res_loader = DataLoader(
+                dataset,
+                batch_size=args.eval_batch_size * torch.cuda.device_count(),
+                num_workers=args.workers
+            )
 
-            for i, data in enumerate(loader):
+            # Compute saliency maps for results
+            for i, data in enumerate(res_loader):
                 samples, paths = data[0].to(device), data[1]
                 salmaps = explainer(x_q, samples)
 
-                # convert to numpy
+                # Convert to numpy
                 salmaps = salmaps.cpu().numpy()
 
-                # save output map
-                base_path = os.path.join(args.save_dir, img.split('/')[-1])
+                # Save output maps in query-based folder
+                base_path = os.path.join(args.save_dir, os.path.basename(query_name))
                 if not os.path.exists(base_path):
                     os.makedirs(base_path)
 
                 for s, p in zip(reversed(salmaps), reversed(paths)):
-                    np.save(os.path.join(base_path, p.split('/')[-1]), s)
+                    np.save(os.path.join(base_path, os.path.basename(p)), s)
 
 
 def main(args):
