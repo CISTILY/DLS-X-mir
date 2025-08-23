@@ -2,35 +2,32 @@
 python train.py --dataset 'covid' --dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9' --model densenet121 --resume model.pth --train-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train.txt --test-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/test.txt -p 2
 python train.py --dataset 'covid' --dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9' --model ViT --train-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train.txt --test-image-list D:/DLS-X-mir/covidx-cxr2/versions/9/test.txt -p 2
 
-
 2. Inferece from trained ResNet50 or Densenet121
-python inference.py --embedding-dim 512 --resume D:/DLS-X-mir/X-mir-clone/checkpoints/covid_resnet50_seed_0_epoch_10_ckpt.pth --image-list D:/DLS-X-mir/covidx-cxr2/versions/9/train
-python inference.py --embedding-dim 512 --resume D:/DLS-X-mir/X-mir-clone/checkpoints/covid_resnet50_seed_0_epoch_10_ckpt.pth --image-list D:\DLS-X-mir\covidx-cxr2\versions\Test
+python inference.py --embedding-dim 512 --resume F:/CODE/DLS-X-mir/X-mir-clone/checkpoints/covid_densenet121_seed_0_epoch_20_ckpt.pth --image-list F:/CODE/DLS-X-mir/datasets/andyczhao/covidx-cxr2/versions/9/train
+python inference.py --embedding-dim 512 --resume F:/CODE/DLS-X-mir/X-mir-clone/checkpoints/covid_densenet121_seed_0_epoch_20_ckpt.pth --image-list F:/CODE/DLS-X-mir/datasets/andyczhao/covidx-cxr2/versions/9/test  
 
 3. Command to compile java source file
-javac -d ./out/ D:/DLS-X-mir/SearchAndIndexingJavaCode/hiD/index/*.java
-javac -d ./out/ D:/DLS-X-mir/SearchAndIndexingJavaCode/hiD/data/*.java
-javac -d ./out/ D:/DLS-X-mir/SearchAndIndexingJavaCode/hiD/search/*.java
-javac -d ./out/ D:/DLS-X-mir/SearchAndIndexingJavaCode/hiD/utils/*.java
+javac -d ./out/ F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/hiD/index/*.java
+javac -d ./out/ F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/hiD/data/*.java
+javac -d ./out/ F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/hiD/search/*.java
+javac -d ./out/ F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/hiD/utils/*.java
+
 
 4. Command to indexing and DLS
-   1. java -cp out hiD.data.BuildDataSet D:/DLS-X-mir/SearchAndIndexingJavaCode/train_covid.txt true
-      java -cp out hiD.data.BuildDataSet D:/DLS-X-mir/SearchAndIndexingJavaCode/test_covid.txt true
-      java -cp out hiD.data.BuildDataSet D:\DLS-X-mir\X-mir-clone\inference_results.txt true
+   Build database
+   1. java -cp out hiD.data.BuildDataSet F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/train_covid.txt true
+      java -cp out hiD.data.BuildDataSet F:/CODE/DLS-X-mir/SearchAndIndexingJavaCode/test_covid.txt true
       (Coi chừng nó đẩy file output ra folder DataWorkspace)
 
-   2. java -cp out hiD.index.BuildIndex D:/DLS-X-mir/SearchAndIndexingJavaCode/DataSets/train_covid_512D_67kv.vecs 50
+   Build Index
+   2. java -cp out hiD.index.BuildIndex F:\DataWorkspace\HiD\DataSets\train_covid_512D_67Kv.vecs 50
       (Coi chừng nó đẩy file output ra folder DataWorkspace)
 
-   3. java -cp out hiD.search.TimeIndexSearch D:/DataWorkspace/HiD/Indexes/train_covid_512D_67Kv_50Nr.ndx D:/DataWorkspace/HiD/DataSets/test_covid_512D_8481v.vecs 3 true
-
-   4. java -cp out hiD.search.SearchAccuracyTest D:/DataWorkspace/HiD/Indexes/train_covid_512D_67Kv_50Nr.ndx D:/DataWorkspace/HiD/DataSets/test_covid_512D_8481v.vecs true 0.99 4
-
-5. testing
-python test.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth
-python test.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_ViT_seed_0_epoch_6_ckpt.pth
-
-python read_dist.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth
+   Check running time of DLS
+   3. java -cp out hiD.search.TimeIndexSearch F:\DataWorkspace\HiD\Indexes\train_covid_512D_67Kv_50Nr.ndx "F:\DataWorkspace\HiD\DataSets\test_covid_512D_8482v.vecs" 3 true
 
 6. Saliency map
-python compute_saliency.py --dataset 'covid' --test-dataset-dir 'D:/DLS-X-mir/covidx-cxr2/versions/9/test' --test-image-list 'D:\DLS-X-mir\covidx-cxr2\versions\9\test.txt' --embedding-dim 512 --resume D:\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth --results D:\DLS-X-mir\X-mir-clone\results\covid_densenet121_seed_0_epoch_20_ckpt.npz
+python compute_saliency.py --dataset 'covid' --test-dataset-dir 'F:/CODE/DLS-X-mir/datasets/andyczhao/covidx-cxr2/versions/9/test' --test-image-list 'F:/CODE/DLS-X-mir/datasets/andyczhao/covidx-cxr2/versions/9/test.txt' --embedding-dim 512 --resume "F:\CODE\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.pth" --results "F:\CODE\DLS-X-mir\X-mir-clone\checkpoints\covid_densenet121_seed_0_epoch_20_ckpt.npz"
+
+7. Evaluate saliency map
+python evaluate_saliency.py
