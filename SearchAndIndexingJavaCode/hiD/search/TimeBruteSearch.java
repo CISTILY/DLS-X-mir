@@ -77,16 +77,16 @@ public class TimeBruteSearch extends FormatUtils {
     boolean theIncludeDups;
 
     if (kOnDevBox) {
-      theDataSet=DataSet.load("GIST_train_960D_1000Kv");
-      theQuerySet=DataSet.load("GIST_test_960D_1000v");
-      theSearchNNear=10;
-      theIncludeDups=false;
-
-    } else {
       theDataSet=DataSet.load(inDataSetFilename);
       theQuerySet=DataSet.load(inQuerySetFilename);
       theSearchNNear=Integer.parseInt(inSearchNNear);
       theIncludeDups=Boolean.parseBoolean(inIncludeDups);
+
+    } else {
+      theDataSet=DataSet.load("GIST_train_960D_1000Kv");
+      theQuerySet=DataSet.load("GIST_test_960D_1000v");
+      theSearchNNear=10;
+      theIncludeDups=false;
     }
 
     timeBruteSearch(theDataSet,theSearchNNear,theIncludeDups,theQuerySet);
